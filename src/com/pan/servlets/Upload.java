@@ -1,14 +1,9 @@
 package com.pan.servlets;
 
-import com.pan.utils.Settings;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import java.io.FilenameFilter;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,12 +18,17 @@ public class Upload extends HttpServlet {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
 
-        // String fileRoot = request.getServletContext().getRealPath("/");
-        String uname = request.getParameter("uname");
+        HttpSession session = request.getSession();
+        if (session.getAttribute("user") == null) {
+            response.sendRedirect("index.html");
+            return;
+        }
+
+        String uname = (String) session.getAttribute("user");
         Part part = request.getPart("upfile");
         String upfilename = part.getSubmittedFileName();
 
-        String fileRoot = new Settings().fileRoot;
+        String fileRoot = getServletContext().getInitParameter("fileRoot");
         String userRoot = fileRoot + "\\" + uname;
         System.out.println(userRoot);
 
@@ -54,8 +54,10 @@ public class Upload extends HttpServlet {
                 } catch (IOException e) {
                     if (!Files.exists(rootPath)) {
                         Files.createDirectories(rootPath);
+                    } else {
+                        e.printStackTrace();
+                        return;
                     }
-                    e.printStackTrace();
                 }
             }
         }

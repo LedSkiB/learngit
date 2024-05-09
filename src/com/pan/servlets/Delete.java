@@ -1,6 +1,5 @@
 package com.pan.servlets;
 
-import com.pan.utils.Settings;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +17,7 @@ public class Delete extends HttpServlet {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
-        String fileRoot = new Settings().fileRoot;
+        String fileRoot = getServletContext().getInitParameter("fileRoot");
 
         String uname = request.getParameter("uname");
         String userRoot = fileRoot + "\\" + uname;

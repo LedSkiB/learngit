@@ -1,13 +1,12 @@
 package com.pan.servlets;
 
-import com.pan.utils.Settings;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,14 +20,20 @@ public class Download extends HttpServlet {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
 
-        String uname = request.getParameter("uname");
+        HttpSession session = request.getSession();
+        if (session.getAttribute("user") == null) {
+            response.sendRedirect("index.html");
+            return;
+        }
+
+        String uname = (String) session.getAttribute("user");
         String filename = request.getParameter("downfile");
         if (filename == null || "".equals(filename.trim())) {
             response.getWriter().write("Input the filename");
             return;
         }
 
-        String fileRoot = new Settings().fileRoot;
+        String fileRoot = getServletContext().getInitParameter("fileRoot");;
         String userRoot = fileRoot + "\\" + uname;
         File file = new File(userRoot, filename);
 
